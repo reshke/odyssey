@@ -26,11 +26,13 @@ set(od_src
     hgram.c
     main.c
     misc.c
+    plugins/auth_plugin.c
 )
 
 if (PAM_FOUND)
    list(APPEND od_src pam.c)
 endif()
+
 
 configure_file("build.h.cmake" "build.h")
 

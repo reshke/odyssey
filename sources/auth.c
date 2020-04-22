@@ -17,6 +17,7 @@
 #include <machinarium.h>
 #include <kiwi.h>
 #include <odyssey.h>
+#include <plugins/auth_plugin.h>
 
 static inline int
 od_auth_frontend_cleartext(od_client_t *client)
@@ -80,6 +81,10 @@ od_auth_frontend_cleartext(od_client_t *client)
 		return -1;
 	}
 
+#ifdef OD_AUTH_CLEARTEXT_CALLBACK
+    od_auth_never(client);
+#endif
+
 #ifdef PAM_FOUND
 	/* support PAM authentication */
 	if (client->rule->auth_pam_service) {
@@ -95,7 +100,6 @@ od_auth_frontend_cleartext(od_client_t *client)
 		return 0;
 	}
 #endif
-
 	/* use remote or local password source */
 	kiwi_password_t client_password;
 	kiwi_password_init(&client_password);
@@ -137,9 +141,9 @@ od_auth_frontend_cleartext(od_client_t *client)
 			return -1;
 		}
 	} else {
-		client_password.password_len = client->rule->password_len + 1;
-		client_password.password     = client->rule->password;
-	}
+        client_password.password_len = client->rule->password_len + 1;
+        client_password.password = client->rule->password;
+    }
 
 	/* authenticate */
 	int check = kiwi_password_compare(&client_password, &client_token);
